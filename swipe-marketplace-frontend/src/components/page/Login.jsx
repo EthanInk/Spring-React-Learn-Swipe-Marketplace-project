@@ -1,39 +1,39 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import { Typography } from "@material-tailwind/react";
+import { Typography, Alert } from "@material-tailwind/react";
+import { useState } from "react";
+import LoginSchema from "../../schema/LoginSchema";
 export default function Login() {
-
-  const [email] = useState("Ethan@gmail.com");
-  const [password] = useState("Ethan");
+  const [errorMessage, setErrorMessage] = useState("");
+  const email = "Ethan@gmail.com";
+  const password = "Ethan";
   const navigate = useNavigate();
   const authContext = useAuth();
 
-  async function onSubmitForm() {
-    console.log(`U: ${email}, P: ${password}`);
-    await authContext.login(email, password)
-    .then((response) => {
-      if(response) console.log(true);
-      if(!response) console.log(false);
-      // navigate("/LOGGEDIN");
-    });
-  }
-  function validateForm(values) {
-    let errors = {};
-    if (values.email.length < 5) errors.email = "enter longer description";
-    return errors;
+  async function onSubmitForm(values) {
+    const { email, password } = values;
+    await authContext
+      .login(email, password)
+      .then(() => {
+        navigate("/LOGGEDIN");
+      })
+      .catch(() => {
+        setErrorMessage("Incorrect log in details.");
+      });
   }
 
   return (
     <div className={"Login w-72 m-auto"}>
-      <Typography variant="h2" className="py-4">Login</Typography>
+      <Typography variant="h2" className="py-4">
+        Login
+      </Typography>
       <Formik
         initialValues={{ email, password }}
         enableReinitialize={true}
         onSubmit={onSubmitForm}
-        validate={validateForm}
-        validateOnChange={false}
+        validationSchema={LoginSchema}
+        validateOnChange={true}
         validateOnBlur={true}
       >
         {() => (
@@ -50,7 +50,6 @@ export default function Login() {
                     Email
                   </label>
                 </fieldset>
-                <ErrorMessage name="email" component={"div"}></ErrorMessage>
                 <fieldset className="relative h-11 w-full min-w-[200px]">
                   <Field
                     type="password"
@@ -61,19 +60,28 @@ export default function Login() {
                     Password
                   </label>
                 </fieldset>
-                <ErrorMessage name="password" component={"div"}></ErrorMessage>
               </div>
               <button
-                className="mt-6 block w-full select-none rounded-lg bg-blue-500 py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                className="mb-2 block w-full select-none rounded-lg bg-blue-500 py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/40 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                 type="submit"
                 data-ripple-light="true"
               >
                 Login
               </button>
             </div>
+            <ErrorMessage name="email" component={"div"}>
+              {(msg) => <Alert color="red">{msg}</Alert>}
+            </ErrorMessage>
+            <ErrorMessage name="password" component={"div"}>
+              {(msg) => <Alert color="red">{msg}</Alert>}
+            </ErrorMessage>
           </Form>
         )}
       </Formik>
+      <div className={`${errorMessage ? "" : "hidden"} my-4`}>
+        <Alert color="red">{errorMessage}</Alert>
+      </div>
+      <span>Don&apos;t have an account? <Link to="/register" className="text-blue-500">Register here.</Link></span>
     </div>
   );
 }

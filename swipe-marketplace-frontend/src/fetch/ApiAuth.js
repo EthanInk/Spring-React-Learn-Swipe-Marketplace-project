@@ -1,11 +1,11 @@
 import { apiClient } from "./ApiClient";
 
-export function exeJWTAuth(username, password) {
-  const baToken = "Basic " + window.btoa(username + ":" + password);
+export function exeJWTAuth(email, password) {
+  const baToken = "Basic " + window.btoa(email + ":" + password);
   return apiClient.post(
     `/login`,
     {
-      username,
+      email,
       password,
     },
     {
@@ -14,4 +14,8 @@ export function exeJWTAuth(username, password) {
       },
     }
   );
+}
+
+export function regesterNewUser(email, name, surname, password) {
+  return apiClient.post(`/register`, { email, name, surname, password });
 }

@@ -2,9 +2,10 @@ import Login from "./page/Login";
 import PropTypes from "prop-types";
 import AuthProvider, { useAuth } from "../context/AuthContext";
 import Error from "./page/Error";
-// import { useAuth } from "../context/AuthContext";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Header from "./common/Header";
+import Register from "./page/Register";
+import Welcom from "./page/Welcome";
 
 function AuthenticatedRoute({ children }) {
   const authContext = useAuth();
@@ -27,6 +28,9 @@ function AppMain() {
           <Routes>
             <Route path="/" element={<Login></Login>}></Route>
             <Route path="/login" element={<Login></Login>}></Route>
+            <Route path="/register" element={<Register></Register>}></Route>
+            <Route path="/logout" element={<Register></Register>}></Route>
+            <Route path="/welcome" element={<Welcom></Welcom>}></Route>
 {/* 
             <Route
               path="/welcome"

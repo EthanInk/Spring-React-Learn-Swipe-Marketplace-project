@@ -39,7 +39,7 @@ public class JwtAuthSecurityConfiguration {
     SecurityFilterChain jwtAuthSecurityChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors();
         httpSecurity.authorizeHttpRequests(
-                auth -> auth.anyRequest().authenticated()
+                auth -> auth.requestMatchers("/register").permitAll().anyRequest().authenticated()
         );
         httpSecurity.sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -64,12 +64,10 @@ public class JwtAuthSecurityConfiguration {
     @Bean
     public UserDetailsService userDetailsService(DataSource dataSource) {
         UserDetails userUser = User.withUsername("Ethan@gmail.com")
-//                .password("{noop}Ethan")
                 .password("Ethan")
                 .passwordEncoder(str -> bCryptPasswordEncoder().encode(str))
                 .roles("USER").build();
         UserDetails userAdmin = User.withUsername("EthanAdmin@gmail.com")
-//                .password("{noop}Ethan")
                 .password("Ethan")
                 .passwordEncoder(str -> bCryptPasswordEncoder().encode(str))
                 .roles("ADMIN").build();
