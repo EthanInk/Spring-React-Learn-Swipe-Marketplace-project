@@ -37,6 +37,7 @@ public class JwtAuthSecurityConfiguration {
 
     @Bean
     SecurityFilterChain jwtAuthSecurityChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.cors();
         httpSecurity.authorizeHttpRequests(
                 auth -> auth.anyRequest().authenticated()
         );
@@ -55,7 +56,7 @@ public class JwtAuthSecurityConfiguration {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedMethods("*").allowedOrigins("http://localhost:3000");
+                registry.addMapping("/**").allowedMethods("*").allowedOrigins("http://localhost/");
             }
         };
     }
@@ -109,12 +110,6 @@ public class JwtAuthSecurityConfiguration {
     public JWKSource<SecurityContext> jwkSource(RSAKey rsaKey) {
         var jwkSet = new JWKSet(rsaKey);
         return (jwkSelector, context) -> jwkSelector.select(jwkSet);
-//        new JWKSource() {
-//            @Override
-//            public List get(JWKSelector jwkSelector, SecurityContext context) {
-//                return jwkSelector.select(jwkSet);
-//            }
-//        };
     }
 
     @Bean
