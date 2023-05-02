@@ -1,16 +1,18 @@
 import { createContext, useContext, useState } from "react";
 import { exeJWTAuth, regesterNewUser } from "../fetch/ApiAuth";
-import { apiClient } from "../fetch/ApiClient";
+import { addAuthToken, removeAuthToken } from "../fetch/ApiClient";
 import PropTypes from "prop-types";
+import { Navigate } from "react-router-dom";
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-
-
 export default function AuthProvider({ children }) {
-  const localStorageUserData = JSON.parse(localStorage.getItem('userData'));
-  const loadUserData = localStorageUserData ? localStorageUserData : { email: "", token: "" };
+  const localStorageUserData = JSON.parse(localStorage.getItem("userData"));
+  const loadUserData = localStorageUserData
+    ? localStorageUserData
+    : { email: "", token: "" };
+  addAuthToken(loadUserData.token);
   const [userData, setUserData] = useState(loadUserData);
   const [isAuthed, setIsAuthed] = useState(loadUserData.email !== "");
 
@@ -19,25 +21,26 @@ export default function AuthProvider({ children }) {
       const response = await exeJWTAuth(email, password);
       if (response.status === 200) {
         const token = "Bearer " + response.data.token;
+        console.log(token);
         setIsAuthed(true);
         userData.email = email;
         userData.token = token;
         setUserData(userData);
-        localStorage.setItem('userData', JSON.stringify(userData));
-        apiClient.interceptors.request.use((config) => {
-          config.headers.Authorization = token;
-          return config;
-        });
+        localStorage.setItem("userData", JSON.stringify(userData));
+        addAuthToken(token);
         return Promise.resolve("Logged in");
+      } else if (response.status === 401) {
+        resetUserData();
+        removeAuthToken();
+        Navigate({
+          pathname: "/login",
+        });
       }
       setIsAuthed(false);
       return Promise.reject("Loggin failed");
     } catch (error) {
-      setIsAuthed(false);
-      apiClient.interceptors.request.use((config) => {
-        config.headers.Authorization = '';
-        return config;
-      });
+      resetUserData()
+      removeAuthToken();
       return Promise.reject("Loggin failed");
     }
   }
@@ -54,14 +57,21 @@ export default function AuthProvider({ children }) {
   }
 
   function logout() {
+    resetUserData();
+    removeAuthToken();
+  }
+
+  function resetUserData(){
     setIsAuthed(false);
     const userData = { email: "", token: "" };
     setUserData(userData);
-    localStorage.setItem('userData', JSON.stringify(userData));
+    localStorage.setItem("userData", JSON.stringify(userData));
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthed, userData, login, logout, register }}>
+    <AuthContext.Provider
+      value={{ isAuthed, userData, login, logout, register }}
+    >
       {children}
     </AuthContext.Provider>
   );

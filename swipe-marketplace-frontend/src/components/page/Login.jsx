@@ -4,6 +4,7 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Typography, Alert } from "@material-tailwind/react";
 import { useState } from "react";
 import LoginSchema from "../../schema/LoginSchema";
+
 export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const email = "Ethan@gmail.com";
@@ -16,7 +17,7 @@ export default function Login() {
     await authContext
       .login(email, password)
       .then(() => {
-        navigate("/LOGGEDIN");
+        navigate("/welcome");
       })
       .catch(() => {
         setErrorMessage("Incorrect log in details.");

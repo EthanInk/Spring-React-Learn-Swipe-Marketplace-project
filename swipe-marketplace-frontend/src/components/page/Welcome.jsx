@@ -9,9 +9,13 @@ export default function Welcom() {
       <Typography variant="h1" className="text-center">
         Welcome!
       </Typography>
-      <Typography variant="h3" className="text-center">
-        {message}
-      </Typography>
+      {message ? (
+        <Typography variant="h3" className="text-center">
+          {message}
+        </Typography>
+      ) : (
+        ""
+      )}
     </div>
   );
 }
