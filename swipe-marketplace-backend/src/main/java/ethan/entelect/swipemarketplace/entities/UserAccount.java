@@ -1,7 +1,9 @@
 package ethan.entelect.swipemarketplace.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -26,15 +28,21 @@ public class UserAccount {
     @NotNull
     private String surname;
     @NotNull
+    @JsonIgnore
     private boolean accountEnabled;
+    @JsonIgnore
     private String accountDisabledReason;
     @OneToMany(mappedBy = "postedBy")
+    @JsonIgnore
     private List<Post> posts;
-    @OneToMany
+    @ManyToMany
+    @JsonIgnore
     private List<Post> likedPosts;
-    @OneToMany
+    @ManyToMany
+    @JsonIgnore
     private List<Post> dislikedPosts;
-    @OneToMany
+    @ManyToMany
+    @JsonIgnore
     private List<Conversation> conversations;
 }
 

@@ -4,18 +4,23 @@ import AuthProvider, { useAuth } from "../context/AuthContext";
 import PostProvider from "../context/PostContext";
 import Error from "./page/Error";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Header from "./common/Header";
+import Header from "./common/page/Header";
 import Register from "./page/Register";
-import Welcom from "./page/Welcome";
-import Post from "./page/Post";
-import Posts from "./page/Posts";
+import Welcome from "./page/Welcome";
+import CreatePost from "./page/CreatePost";
+import SinglePost from "./page/SinglePost";
+import SearchPosts from "./page/SearchPosts";
+import Logout from "./page/Logout";
+import LikedPosts from "./page/LikedPosts";
+import DislikedPosts from "./page/DislikedPosts";
+import Account from "./page/Account"
 
 function AuthenticatedRoute({ children }) {
   const authContext = useAuth();
   if (authContext.isAuthed) {
     return children;
   }
-  return <Navigate to="/"></Navigate>;
+  return <Navigate to="/login"></Navigate>;
 }
 
 AuthenticatedRoute.propTypes = {
@@ -30,40 +35,51 @@ function AppMain() {
           <BrowserRouter>
             <Header />
             <Routes>
-              <Route path="/" element={<Login></Login>}></Route>
+              <Route path="/" element={<Welcome></Welcome>}></Route>
               <Route path="/login" element={<Login></Login>}></Route>
               <Route path="/register" element={<Register></Register>}></Route>
-              <Route path="/logout" element={<Register></Register>}></Route>
-              <Route path="/welcome" element={<Welcom></Welcom>}></Route>
-              <Route path="/post" element={<Post></Post>}></Route>
-              <Route path="/posts" element={<Posts></Posts>}></Route>
-              {/* 
-            <Route
-              path="/welcome"
-              element={
-                <AuthenticatedRoute>
-                  <Welcom></Welcom>
-                </AuthenticatedRoute>
-              }
-            ></Route>
-            <Route
-              path="/todos"
-              element={
-                <AuthenticatedRoute>
-                  <ListTodos></ListTodos>
-                </AuthenticatedRoute>
-              }
-            ></Route>
-            <Route
-              path="/todos/:id"
-              element={
-                <AuthenticatedRoute>
-                  <Todo></Todo>
-                </AuthenticatedRoute>
-              }
-            ></Route> */}
-
-              {/* <Route path="/logout" element={<Logout></Logout>}></Route> */}
+              <Route path="/logout" element={<Logout></Logout>}></Route>
+              <Route path="/welcome" element={<Welcome></Welcome>}></Route>
+              <Route
+                path="/posts"
+                element={<SearchPosts></SearchPosts>}
+              ></Route>
+              <Route
+                path="/posts/:id"
+                element={<SinglePost></SinglePost>}
+              ></Route>
+              <Route
+                path="/createPost"
+                element={
+                  <AuthenticatedRoute>
+                    <CreatePost></CreatePost>
+                  </AuthenticatedRoute>
+                }
+              ></Route>
+              <Route
+                path="/posts/liked"
+                element={
+                  <AuthenticatedRoute>
+                    <LikedPosts></LikedPosts>
+                  </AuthenticatedRoute>
+                }
+              ></Route>
+              <Route
+                path="/posts/disliked"
+                element={
+                  <AuthenticatedRoute>
+                    <DislikedPosts></DislikedPosts>
+                  </AuthenticatedRoute>
+                }
+              ></Route>
+              <Route
+                path="/account"
+                element={
+                  <AuthenticatedRoute>
+                    <Account></Account>
+                  </AuthenticatedRoute>
+                }
+              ></Route>
               <Route path="*" element={<Error></Error>}></Route>
             </Routes>
           </BrowserRouter>

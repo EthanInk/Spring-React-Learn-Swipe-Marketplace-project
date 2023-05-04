@@ -7,7 +7,7 @@ export default function Logout() {
 
   useEffect(() => {
     authContext.logout();
-  });
+  },[]);
 
   return (
     <div className="py-16">

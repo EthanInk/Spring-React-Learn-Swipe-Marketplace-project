@@ -3,11 +3,13 @@ import { Typography, Alert, Button } from "@material-tailwind/react";
 import { useState } from "react";
 import PostSchema from "../../schema/PostSchema";
 import { usePost } from "../../context/PostContext";
+import { useNavigate } from "react-router-dom";
 
-export default function Post() {
+export default function CreatePost() {
   const postContext = usePost();
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
+  const navigate = useNavigate();
   async function onSubmitForm(values) {
     values.images = selectedImages;
     const { title, description, address, images, price, tags } = values;
@@ -18,7 +20,10 @@ export default function Post() {
       images,
       price,
       tags
-    ).catch(()=>{
+    ).then((response)=>{
+      console.log(response);
+      navigate("/post/" + response.data)
+    }).catch(()=>{
       setErrorMessage("Error posting")
     });
   }

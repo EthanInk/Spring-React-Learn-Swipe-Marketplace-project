@@ -3,13 +3,14 @@ import axios from "axios";
 export let apiClient = axiosCreatBase();
 
 function axiosCreatBase() {
-  return axios.create({
+   const req = axios.create({
     baseURL: "http://localhost:5000",
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Accept": "*/*"
     },
   })
+  return req;
 }
 
 export function addAuthToken(token){

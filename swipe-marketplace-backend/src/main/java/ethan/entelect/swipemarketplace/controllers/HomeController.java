@@ -57,4 +57,9 @@ public class HomeController {
         }
     }
 
+    @GetMapping("/authed")
+    public ResponseEntity<Boolean> isAuthed(){
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

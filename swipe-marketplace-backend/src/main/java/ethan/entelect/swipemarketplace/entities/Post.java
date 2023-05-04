@@ -24,7 +24,11 @@ public class Post {
     @NotNull
     private String title;
     @NotNull
+    @Column(length = 2255)
     private String description;
+    @NotNull
+    @Column(length = 2255)
+    private String address;
     @NotNull
     private LocalDateTime postedAt;
     @NotNull

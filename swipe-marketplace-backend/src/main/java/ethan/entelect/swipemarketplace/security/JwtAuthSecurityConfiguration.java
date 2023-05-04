@@ -39,7 +39,13 @@ public class JwtAuthSecurityConfiguration {
     SecurityFilterChain jwtAuthSecurityChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors();
         httpSecurity.authorizeHttpRequests(
-                auth -> auth.requestMatchers("/register").permitAll().anyRequest().authenticated()
+                auth -> auth
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/register").permitAll()
+                        .requestMatchers("/api/v1/posts").permitAll()
+                        .requestMatchers("/api/v1/posts/{id}").permitAll()
+                        .anyRequest().authenticated()
         );
         httpSecurity.sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

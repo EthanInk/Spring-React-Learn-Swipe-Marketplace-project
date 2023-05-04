@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { exeJWTAuth, regesterNewUser } from "../fetch/ApiAuth";
+import { exeJWTAuth, regesterNewUser, chechAuth, getOwnDetails, updateOwnDetails } from "../fetch/ApiAuth";
 import { addAuthToken, removeAuthToken } from "../fetch/ApiClient";
 import PropTypes from "prop-types";
 import { Navigate } from "react-router-dom";
@@ -14,7 +14,7 @@ export default function AuthProvider({ children }) {
     : { email: "", token: "" };
   addAuthToken(loadUserData.token);
   const [userData, setUserData] = useState(loadUserData);
-  const [isAuthed, setIsAuthed] = useState(loadUserData.email !== "");
+  const [isAuthed, setIsAuthed] = useState(loadUserData.email);
 
   async function login(email, password) {
     try {
@@ -22,28 +22,36 @@ export default function AuthProvider({ children }) {
       if (response.status === 200) {
         const token = "Bearer " + response.data.token;
         console.log(token);
-        setIsAuthed(true);
         userData.email = email;
         userData.token = token;
         setUserData(userData);
         localStorage.setItem("userData", JSON.stringify(userData));
         addAuthToken(token);
+        setIsAuthed(true);
         return Promise.resolve("Logged in");
       } else if (response.status === 401) {
-        resetUserData();
-        removeAuthToken();
-        Navigate({
-          pathname: "/login",
-        });
+        logout();
+        Navigate("/login");
       }
-      setIsAuthed(false);
       return Promise.reject("Loggin failed");
     } catch (error) {
-      resetUserData()
-      removeAuthToken();
+      logout();
       return Promise.reject("Loggin failed");
     }
   }
+
+  async function isAuthedUpdate() {
+    try {
+      const response = await chechAuth();
+      if (response.status === 200) {
+        setIsAuthed(true);
+      }
+      logout();
+    } catch (error) {
+      logout();
+    }
+  }
+
   async function register(email, name, surname, password) {
     try {
       const response = await regesterNewUser(email, name, surname, password);
@@ -56,13 +64,37 @@ export default function AuthProvider({ children }) {
     }
   }
 
+  async function getUserDetails() {
+    try {
+      const response = await getOwnDetails();
+      if (response.status === 200) {
+        return Promise.resolve(response.data);
+      }
+      return Promise.reject("Get user data failed");
+    } catch (error) {
+      return Promise.reject("Get user data failed");
+    }
+  }
+  async function postUserDetails(name,surname) {
+    try {
+      const response = await updateOwnDetails(name,surname);
+      if (response.status === 201) {
+        return Promise.resolve("Registaration success");
+      }
+      return Promise.reject("Registaration failed");
+    } catch (error) {
+      return Promise.reject("Registaration failed");
+    }
+  }
+
   function logout() {
+    console.log("Logging out");
+    setIsAuthed(false);
     resetUserData();
     removeAuthToken();
   }
 
-  function resetUserData(){
-    setIsAuthed(false);
+  function resetUserData() {
     const userData = { email: "", token: "" };
     setUserData(userData);
     localStorage.setItem("userData", JSON.stringify(userData));
@@ -70,7 +102,7 @@ export default function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthed, userData, login, logout, register }}
+      value={{ isAuthed, isAuthedUpdate, userData, login, logout, register, getUserDetails, postUserDetails }}
     >
       {children}
     </AuthContext.Provider>

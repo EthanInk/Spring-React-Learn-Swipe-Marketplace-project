@@ -22,10 +22,14 @@ public class NewPostDto {
     @NotNull
     private String title;
     @NotNull
+    @Column(length = 2255)
     private String description;
     @NotNull
+    @Column(length = 2255)
+    private String address;
+    @NotNull
     @PositiveOrZero
-    private Integer price;
+    private int price;
     private List<MultipartFile> images;
-    private List<Tag> tags;
+    private String tags;
 }
