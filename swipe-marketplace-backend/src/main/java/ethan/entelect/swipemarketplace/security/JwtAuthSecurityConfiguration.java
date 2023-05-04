@@ -62,31 +62,9 @@ public class JwtAuthSecurityConfiguration {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedMethods("*").allowedOrigins("http://localhost/");
+                registry.addMapping("/**").allowedMethods("*").allowedOrigins("http://localhost/","https://swipe-marketplace.s3.af-south-1.amazonaws.com/");
             }
         };
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(DataSource dataSource) {
-        UserDetails userUser = User.withUsername("Ethan@gmail.com")
-                .password("Ethan")
-                .passwordEncoder(str -> bCryptPasswordEncoder().encode(str))
-                .roles("USER").build();
-        UserDetails userAdmin = User.withUsername("EthanAdmin@gmail.com")
-                .password("Ethan")
-                .passwordEncoder(str -> bCryptPasswordEncoder().encode(str))
-                .roles("ADMIN").build();
-        var newJdbcUserManager = new JdbcUserDetailsManager(dataSource);
-        newJdbcUserManager.createUser(userUser);
-        newJdbcUserManager.createUser(userAdmin);
-
-        return newJdbcUserManager;
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScript(JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION).build();
     }
 
     @Bean

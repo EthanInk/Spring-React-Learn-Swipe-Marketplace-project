@@ -6,7 +6,7 @@ import ethan.entelect.swipemarketplace.entities.Conversation;
 import ethan.entelect.swipemarketplace.entities.Message;
 import ethan.entelect.swipemarketplace.entities.UserAccount;
 import ethan.entelect.swipemarketplace.repositories.ConversationRepository;
-import ethan.entelect.swipemarketplace.repositories.UserRepository;
+import ethan.entelect.swipemarketplace.repositories.UserAccountRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +20,11 @@ import java.util.List;
 @RequestMapping("/api/v1/conversations")
 @AllArgsConstructor
 public class ConversationController {
-    private UserRepository userRepository;
+    private UserAccountRepository userAccountRepository;
     private ConversationRepository conversationRepository;
     @GetMapping
     public List<Conversation> getSelfConversations(Authentication authentication){
-        UserAccount userAccount = userRepository.findById(authentication.getName()).get();
+        UserAccount userAccount = userAccountRepository.findById(authentication.getName()).get();
         return userAccount.getConversations();
     }
 
@@ -40,9 +40,9 @@ public class ConversationController {
 
     @PostMapping
     public ResponseEntity<Conversation> getSelfConversations(@RequestBody NewConversationDto newConversationDto, Authentication authentication){
-        UserAccount selfUser = userRepository.findById(authentication.getName()).orElse(null);
+        UserAccount selfUser = userAccountRepository.findById(authentication.getName()).orElse(null);
         if (selfUser == null) return null;
-        UserAccount postCreatorUser = userRepository.findById(newConversationDto.getUsernameOfPoster()).orElse(null);
+        UserAccount postCreatorUser = userAccountRepository.findById(newConversationDto.getUsernameOfPoster()).orElse(null);
         if (postCreatorUser == null) return null;
         Conversation newConversation = new Conversation();
         newConversation.setPersonA(selfUser);

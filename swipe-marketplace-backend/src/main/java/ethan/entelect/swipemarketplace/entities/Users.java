@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User implements UserDetails {
+public class Users implements UserDetails {
 
     @Id
     @Column(length = 500)
@@ -22,10 +22,10 @@ public class User implements UserDetails {
     @Column(length = 500)
     private String password;
     private boolean enabled;
-    @ManyToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Authorities> authorities;
 
-    public User(String username, String password, List<Authorities> authorities){
+    public Users(String username, String password, List<Authorities> authorities){
         this.username = username;
         this.password = password;
         this.authorities = authorities;
@@ -38,17 +38,17 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override

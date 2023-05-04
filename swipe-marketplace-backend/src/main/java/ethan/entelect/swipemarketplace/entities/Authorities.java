@@ -1,19 +1,24 @@
 package ethan.entelect.swipemarketplace.entities;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.io.Serializable;
+
 @Entity
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Authority implements GrantedAuthority {
-    @Id
-    private Long id;
-    private String authority;
+public class Authorities implements GrantedAuthority {
+    @EmbeddedId
+    private AuthoritiesKey authoritiesKey;
+
+    @Override
+    public String getAuthority() {
+        return authoritiesKey.getAuthority();
+    }
 }
+

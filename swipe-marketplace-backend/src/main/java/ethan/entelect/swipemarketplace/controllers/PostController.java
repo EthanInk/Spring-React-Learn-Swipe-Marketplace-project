@@ -9,7 +9,7 @@ import ethan.entelect.swipemarketplace.entities.UserAccount;
 import ethan.entelect.swipemarketplace.repositories.ImageRepository;
 import ethan.entelect.swipemarketplace.repositories.PostRepository;
 import ethan.entelect.swipemarketplace.repositories.TagRepository;
-import ethan.entelect.swipemarketplace.repositories.UserRepository;
+import ethan.entelect.swipemarketplace.repositories.UserAccountRepository;
 import ethan.entelect.swipemarketplace.services.ImageUploadService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -23,13 +23,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/posts")
 @AllArgsConstructor
 public class PostController {
-    private UserRepository userRepository;
+    private UserAccountRepository userAccountRepository;
     private PostRepository postRepository;
     private TagRepository tagRepository;
     private ImageRepository imageRepository;
@@ -42,7 +41,7 @@ public class PostController {
         if (authentication == null) {
             posts = postRepository.findAll(sortedByDateDesc).toList();
         } else {
-            UserAccount userAccount = userRepository.findById(authentication.getName()).get();
+            UserAccount userAccount = userAccountRepository.findById(authentication.getName()).get();
             List<Post> doNotIncludePosts = new ArrayList<>();
             doNotIncludePosts.addAll(userAccount.getLikedPosts());
             doNotIncludePosts.addAll(userAccount.getDislikedPosts());
@@ -58,13 +57,13 @@ public class PostController {
 
     @GetMapping("/own")
     public List<Post> getSelfPosts(Authentication authentication) {
-        UserAccount userAccount = userRepository.findById(authentication.getName()).get();
+        UserAccount userAccount = userAccountRepository.findById(authentication.getName()).get();
         return userAccount.getPosts();
     }
 
     @PostMapping("/own")
     public ResponseEntity<Post> postNewPost(@Valid @ModelAttribute NewPostDto newPostDto, Authentication authentication) {
-        UserAccount userAccount = userRepository.findById(authentication.getName()).get();
+        UserAccount userAccount = userAccountRepository.findById(authentication.getName()).get();
         List<Tag> tags = Arrays.stream(newPostDto.getTags().split("#")).filter(tag ->
                 !tag.trim().isEmpty()
         ).map(tag ->
@@ -94,7 +93,7 @@ public class PostController {
     }
     @PatchMapping("/own")
     public ResponseEntity<Post> updatePost(@Valid @ModelAttribute UpdatePostDto updatePostDto, Authentication authentication) {
-        UserAccount userAccount = userRepository.findById(authentication.getName()).get();
+        UserAccount userAccount = userAccountRepository.findById(authentication.getName()).get();
         Post updatedPost = postRepository.findById(updatePostDto.getId()).orElse(null);
 
         if(updatedPost == null || !userAccount.getEmail().equalsIgnoreCase(updatedPost.getPostedBy().getEmail())) {
@@ -141,13 +140,13 @@ public class PostController {
 
     @GetMapping("/liked")
     public List<Post> getSelfLikedPosts(@RequestParam String pageNumber, @RequestParam String pageSize, @RequestParam String tags, Authentication authentication) {
-        UserAccount userAccount = userRepository.findById(authentication.getName()).get();
+        UserAccount userAccount = userAccountRepository.findById(authentication.getName()).get();
         return userAccount.getLikedPosts();
     }
 
     @PostMapping("/liked/{id}")
     public ResponseEntity<String> addSelfLikedPosts(@PathVariable Long id, Authentication authentication) {
-        UserAccount userAccount = userRepository.findById(authentication.getName()).get();
+        UserAccount userAccount = userAccountRepository.findById(authentication.getName()).get();
         if (userAccount.getLikedPosts().stream().anyMatch((streamPost -> Objects.equals(streamPost.getId(), id)))) {
             return new ResponseEntity<>(HttpStatus.OK);
         }
@@ -156,19 +155,19 @@ public class PostController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         userAccount.getLikedPosts().add(postOptional.get());
-        userRepository.save(userAccount);
+        userAccountRepository.save(userAccount);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/disliked")
     public List<Post> getSelfDislikedPosts(@RequestParam String pageNumber, @RequestParam String pageSize, @RequestParam String tags, Authentication authentication) {
-        UserAccount userAccount = userRepository.findById(authentication.getName()).get();
+        UserAccount userAccount = userAccountRepository.findById(authentication.getName()).get();
         return userAccount.getDislikedPosts();
     }
 
     @PostMapping("/disliked/{id}")
     public ResponseEntity<String> addSelfDislikedPosts(@PathVariable Long id, Authentication authentication) {
-        UserAccount userAccount = userRepository.findById(authentication.getName()).get();
+        UserAccount userAccount = userAccountRepository.findById(authentication.getName()).get();
         if (userAccount.getDislikedPosts().stream().anyMatch((streamPost -> Objects.equals(streamPost.getId(), id)))) {
             return new ResponseEntity<>(HttpStatus.OK);
         }
@@ -177,7 +176,7 @@ public class PostController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         userAccount.getDislikedPosts().add(postOptional.get());
-        userRepository.save(userAccount);
+        userAccountRepository.save(userAccount);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

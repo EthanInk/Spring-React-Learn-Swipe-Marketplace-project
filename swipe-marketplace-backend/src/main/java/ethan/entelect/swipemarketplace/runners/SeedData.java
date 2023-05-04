@@ -1,15 +1,12 @@
 package ethan.entelect.swipemarketplace.runners;
 
-import ethan.entelect.swipemarketplace.entities.Image;
-import ethan.entelect.swipemarketplace.entities.Post;
-import ethan.entelect.swipemarketplace.entities.Tag;
-import ethan.entelect.swipemarketplace.entities.UserAccount;
-import ethan.entelect.swipemarketplace.repositories.ImageRepository;
-import ethan.entelect.swipemarketplace.repositories.PostRepository;
-import ethan.entelect.swipemarketplace.repositories.TagRepository;
-import ethan.entelect.swipemarketplace.repositories.UserRepository;
+import ethan.entelect.swipemarketplace.entities.*;
+import ethan.entelect.swipemarketplace.repositories.*;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -19,20 +16,34 @@ import java.util.List;
 @Component
 public class SeedData implements CommandLineRunner {
 
-    private UserRepository userRepository;
+    private UserAccountRepository userAccountRepository;
     private TagRepository tagRepository;
     private PostRepository postRepository;
     private ImageRepository imageRepository;
+    private UserRepository userRepository;
+    private AuthoritiesRepository authoritiesRepository;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Override
     public void run(String... args) throws Exception {
-        UserAccount user = userRepository.findById("Ethan@gmail.com").orElse(null);
-        if(user != null) return;
+        Users newUser = new Users();
+        newUser.setUsername("Ethan@gmail.com");
+        newUser.setPassword(bCryptPasswordEncoder.encode("Ethan"));
+        newUser.setEnabled(true);
+        Authorities authorities = new Authorities(new AuthoritiesKey("Ethan@gmail.com","USER"));
+        authoritiesRepository.save(authorities);
+        newUser.setAuthorities(List.of(authorities));
+        userRepository.save(newUser);
+
+
+        UserAccount user = userAccountRepository.findById("Ethan@gmail.com").orElse(null);
+        if (user != null) return;
         user = new UserAccount();
         user.setEmail("Ethan@gmail.com");
         user.setName("Ethan");
         user.setSurname("Test");
         user.setAccountEnabled(true);
-        userRepository.save(user);
+        userAccountRepository.save(user);
 
         Tag tag = new Tag("Cat");
         tagRepository.save(tag);
