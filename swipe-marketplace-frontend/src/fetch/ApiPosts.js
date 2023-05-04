@@ -1,6 +1,7 @@
 import { apiClient } from "./ApiClient";
 
 const baseUrl = "/api/v1/posts";
+
 export function postAd(title, description, address, images, price, tags) {
   const formData = new FormData();
   for (let i = 0; i < images.length; i++) {
@@ -12,6 +13,20 @@ export function postAd(title, description, address, images, price, tags) {
   formData.append("price", price);
   formData.append("tags", tags);
   return apiClient.post(`${baseUrl}/own`, formData);
+}
+export function updateOwnAd(id, title, description, address, oldImages, newImages, price, tags) {
+  const formData = new FormData();
+  for (let i = 0; i < newImages.length; i++) {
+    formData.append("newImages", newImages[i]);
+  }
+  formData.append("id", id)
+  formData.append("oldImages", oldImages)
+  formData.append("title", title);
+  formData.append("description", description);
+  formData.append("address", address);
+  formData.append("price", price);
+  formData.append("tags", tags);
+  return apiClient.patch(`${baseUrl}/own`, formData);
 }
 
 export function getOwnPosts() {

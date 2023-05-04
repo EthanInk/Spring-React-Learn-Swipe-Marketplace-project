@@ -13,7 +13,8 @@ import SearchPosts from "./page/SearchPosts";
 import Logout from "./page/Logout";
 import LikedPosts from "./page/LikedPosts";
 import DislikedPosts from "./page/DislikedPosts";
-import Account from "./page/Account"
+import Account from "./page/Account";
+import EditPost from "./page/EditPost";
 
 function AuthenticatedRoute({ children }) {
   const authContext = useAuth();
@@ -71,6 +72,10 @@ function AppMain() {
                     <DislikedPosts></DislikedPosts>
                   </AuthenticatedRoute>
                 }
+              ></Route>
+              <Route
+                path="/posts/edit/:id"
+                element={<EditPost></EditPost>}
               ></Route>
               <Route
                 path="/account"

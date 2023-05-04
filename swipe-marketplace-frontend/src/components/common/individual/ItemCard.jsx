@@ -27,7 +27,7 @@ export default function ItemCard({
     <Card
       onClick={cardClickFunc}
       shadow={false}
-      className="relative grid max-h-full h-[40rem] max-w-full w-[32rem] items-end overflow-hidden text-center"
+      className="relative grid max-h-full h-[38rem] max-w-full w-[30rem] items-end overflow-hidden text-center"
     >
       <CardHeader
         floated={false}
@@ -38,7 +38,7 @@ export default function ItemCard({
       >
         <div className="to-bg-black-10 absolute inset-0 h-full w-full bg-gradient-to-t from-black/80 via-black/50" />
       </CardHeader>
-      <CardBody className="relative py-8 px-6 md:px-12">
+      <CardBody className="relative py-8 md:px-12">
         <Typography
           variant="h2"
           color="white"

@@ -13,19 +13,14 @@ export default function CreatePost() {
   async function onSubmitForm(values) {
     values.images = selectedImages;
     const { title, description, address, images, price, tags } = values;
-    await postContext.postNewAd(
-      title,
-      description,
-      address,
-      images,
-      price,
-      tags
-    ).then((response)=>{
-      console.log(response);
-      navigate("/post/" + response.data)
-    }).catch(()=>{
-      setErrorMessage("Error posting")
-    });
+    await postContext
+      .postNewAd(title, description, address, images, price, tags)
+      .then((data) => {
+        navigate("/posts/" + data.id);
+      })
+      .catch(() => {
+        setErrorMessage("Error posting");
+      });
   }
 
   return (
@@ -109,9 +104,11 @@ export default function CreatePost() {
                   />
                   <Button onClick={() => setSelectedImages([])}>Clear</Button>
                 </fieldset>
-                {selectedImages.map((image, index) => (
-                  <img key={index} src={URL.createObjectURL(image)} alt="" />
-                ))}
+                <div className="grid grid-flow-row grid-cols-2 gap-2">
+                  {selectedImages.map((image, index) => (
+                    <img className="aspect-w-1 aspect-h-1 border" key={index} src={URL.createObjectURL(image)} alt="" />
+                  ))}
+                </div>
                 <fieldset className="relative h-11 w-full min-w-[200px]">
                   <Field
                     type="text"

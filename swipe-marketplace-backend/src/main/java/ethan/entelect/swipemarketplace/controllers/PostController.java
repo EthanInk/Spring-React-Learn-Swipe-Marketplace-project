@@ -1,6 +1,7 @@
 package ethan.entelect.swipemarketplace.controllers;
 
 import ethan.entelect.swipemarketplace.dtos.NewPostDto;
+import ethan.entelect.swipemarketplace.dtos.UpdatePostDto;
 import ethan.entelect.swipemarketplace.entities.Image;
 import ethan.entelect.swipemarketplace.entities.Post;
 import ethan.entelect.swipemarketplace.entities.Tag;
@@ -10,6 +11,7 @@ import ethan.entelect.swipemarketplace.repositories.PostRepository;
 import ethan.entelect.swipemarketplace.repositories.TagRepository;
 import ethan.entelect.swipemarketplace.repositories.UserRepository;
 import ethan.entelect.swipemarketplace.services.ImageUploadService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -61,7 +63,7 @@ public class PostController {
     }
 
     @PostMapping("/own")
-    public ResponseEntity<Post> postNewPost(@ModelAttribute NewPostDto newPostDto, Authentication authentication) {
+    public ResponseEntity<Post> postNewPost(@Valid @ModelAttribute NewPostDto newPostDto, Authentication authentication) {
         UserAccount userAccount = userRepository.findById(authentication.getName()).get();
         List<Tag> tags = Arrays.stream(newPostDto.getTags().split("#")).filter(tag ->
                 !tag.trim().isEmpty()
@@ -89,6 +91,47 @@ public class PostController {
 
         postRepository.save(newUserPost);
         return new ResponseEntity<>(newUserPost, HttpStatus.CREATED);
+    }
+    @PatchMapping("/own")
+    public ResponseEntity<Post> updatePost(@Valid @ModelAttribute UpdatePostDto updatePostDto, Authentication authentication) {
+        UserAccount userAccount = userRepository.findById(authentication.getName()).get();
+        Post updatedPost = postRepository.findById(updatePostDto.getId()).orElse(null);
+
+        if(updatedPost == null || !userAccount.getEmail().equalsIgnoreCase(updatedPost.getPostedBy().getEmail())) {
+           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<Tag> updateTags = Arrays.stream(updatePostDto.getTags().split("#")).filter(tag ->
+                !tag.trim().isEmpty()
+        ).map(tag ->
+                new Tag(tag.trim())
+        ).map(tag ->
+                tagRepository.findById(tag.getTag()).or(() ->
+                        Optional.of(tagRepository.save(tag))
+                ).get()
+        ).toList();
+
+        updatedPost.setTitle(updatePostDto.getTitle());
+        updatedPost.setDescription(updatePostDto.getDescription());
+        updatedPost.setAddress(updatePostDto.getAddress());
+        updatedPost.setPrice(updatePostDto.getPrice());
+        updatedPost.getTags().clear();
+        updatedPost.getTags().addAll(updateTags);
+
+        if(updatePostDto.getNewImages() != null && !updatePostDto.getNewImages().isEmpty()) {
+            List<Image> newUploadedImages = imageUploadService.uploadImagesGetURL(updatePostDto.getNewImages());
+            imageRepository.saveAll(newUploadedImages);
+            List<Image> newSavedList = new ArrayList<>(newUploadedImages);
+            updatePostDto.getOldImages().forEach(imageId -> {
+                var imageOptional = imageRepository.findById(imageId);
+                imageOptional.ifPresent(newSavedList::add);
+            });
+            updatedPost.getImages().clear();
+            updatedPost.getImages().addAll(newSavedList);
+        }
+
+        postRepository.save(updatedPost);
+        return new ResponseEntity<>(updatedPost, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

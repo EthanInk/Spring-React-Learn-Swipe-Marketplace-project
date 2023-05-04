@@ -3,9 +3,11 @@ import {
   faArrowLeft,
   faArrowRight,
   faLocation,
+  faPen,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  Button,
   Card,
   CardBody,
   CardFooter,
@@ -14,9 +16,12 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function DetailedItemCard({
   post = {
+    id: "0",
     title: "Title here",
     description: "Description here",
     address: "Cape Town",
@@ -25,20 +30,27 @@ export default function DetailedItemCard({
     images: [],
     tags: [],
     postedBy: {
+      email: "userEmail",
       name: "Seller name",
       surname: "Seller surname",
     },
   },
 }) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const authContext = useAuth();
+  const navigate = useNavigate();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const nextImage = () => {
-    if((currentImageIndex + 1) >= post.images.length) return;
-    setCurrentImageIndex((currentImageIndex + 1));
+    if (currentImageIndex + 1 >= post.images.length) return;
+    setCurrentImageIndex(currentImageIndex + 1);
   };
   const prevImage = () => {
-    if(currentImageIndex <= 0) return;
-    setCurrentImageIndex((currentImageIndex - 1));
+    if (currentImageIndex <= 0) return;
+    setCurrentImageIndex(currentImageIndex - 1);
   };
+  const editAd = () => {
+    navigate(`/posts/edit/${post.id}`);
+  };
+  const ownUsersPost = post.postedBy.email === authContext.userData.email;
   return (
     <Card className="w-96 my-6 relative">
       <CardHeader color="black" className="relative h-72">
@@ -48,13 +60,21 @@ export default function DetailedItemCard({
         />
       </CardHeader>
       <CardBody className="text-center">
-      <span className="absolute z-50 -top-5 right-5 bg-white rounded-full overflow-visible p-1 ring-1 ring-black py-0 text-black">
-          <p className="text-sm">{`${(currentImageIndex+1)} of ${post.images.length}`}</p>
+        <span className="absolute z-50 -top-5 right-5 bg-white rounded-full overflow-visible p-1 ring-1 ring-black py-0 text-black">
+          <p className="text-sm">{`${currentImageIndex + 1} of ${
+            post.images.length
+          }`}</p>
         </span>
-        <button onClick={prevImage} className="absolute z-50 top-24 left-2 bg-white rounded-full overflow-visible p-1 ring-1 ring-black">
+        <button
+          onClick={prevImage}
+          className="absolute z-50 top-24 left-2 bg-white rounded-full overflow-visible p-1 ring-1 ring-black"
+        >
           <FontAwesomeIcon className="px-1" icon={faArrowLeft} />
         </button>
-        <button onClick={nextImage} className="absolute z-50 top-24 right-2 bg-white rounded-full overflow-visible p-1 ring-1 ring-black">
+        <button
+          onClick={nextImage}
+          className="absolute z-50 top-24 right-2 bg-white rounded-full overflow-visible p-1 ring-1 ring-black"
+        >
           <FontAwesomeIcon className="px-1" icon={faArrowRight} />
         </button>
         <Typography variant="h3" className="mb-2">
@@ -83,6 +103,13 @@ export default function DetailedItemCard({
           </Typography>
         </div>
       </CardFooter>
+      {ownUsersPost ? (
+        <Button color="yellow" onClick={editAd}>
+          <FontAwesomeIcon className="px-1" icon={faPen} /> Edit ad
+        </Button>
+      ) : (
+        ""
+      )}
     </Card>
   );
 }
