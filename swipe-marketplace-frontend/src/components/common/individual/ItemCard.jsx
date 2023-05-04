@@ -7,7 +7,17 @@ import {
 } from "@material-tailwind/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
-import { faCheck, faCross, faInfo, faX } from "@fortawesome/free-solid-svg-icons";
+import { faInfo, faX } from "@fortawesome/free-solid-svg-icons";
+import PropTypes from "prop-types";
+
+ItemCard.propTypes = {
+  post: PropTypes.object,
+  showBtn: PropTypes.bool,
+  cardClickFunc: PropTypes.func,
+  likeClickFunc: PropTypes.func,
+  infoClickFunc: PropTypes.func,
+  dislikeClickFunc: PropTypes.func,
+};
 
 export default function ItemCard({
   showBtn = true,
@@ -16,9 +26,11 @@ export default function ItemCard({
   infoClickFunc,
   dislikeClickFunc,
   post = {
-    images: [{
-      url: "https://images.unsplash.com/photo-1552960562-daf630e9278b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
-    }],
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1552960562-daf630e9278b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
+      },
+    ],
     title: "Card title will be here and is clamped to 3 lines",
     price: "000",
   },
